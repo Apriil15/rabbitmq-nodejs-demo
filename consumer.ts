@@ -1,10 +1,12 @@
-import { connect } from 'amqplib'
+import { Options } from 'amqplib'
+import { queue } from './queue'
+import { RabbitMQService } from './rabbitmq-service'
 
-async function receive() {
-  const connection = await connect('amqp://localhost')
-  const channel = await connection.createChannel()
+const options: Options.Consume = { noAck: false }
 
-  const queue = 'hello'
+async function consume(queue: string) {
+  await RabbitMQService.connect()
+  const channel = await RabbitMQService.createChannel()
 
   await channel.assertQueue(queue, {
     durable: true
@@ -22,9 +24,8 @@ async function receive() {
       console.log('Received: ' + msg.content.toString())
       channel.ack(msg)
     },
-    {
-      noAck: false
-    }
+    options
   )
 }
-receive()
+
+consume(queue.test)

@@ -1,22 +1,28 @@
-import { connect } from 'amqplib'
+import { setTimeout } from 'timers/promises'
+import { queue } from './queue'
+import { RabbitMQService } from './rabbitmq-service'
 
-async function send() {
-  const connection = await connect('amqp://localhost')
-  const channel = await connection.createChannel()
+type Params = {
+  queue: string
+  msg: string
+}
 
-  const queue = 'hello'
-  const msg = 'hello'
+async function publish(params: Params) {
+  await RabbitMQService.connect()
+  const channel = await RabbitMQService.createChannel()
 
-  await channel.assertQueue(queue, {
+  await channel.assertQueue(params.queue, {
     durable: true
   })
 
-  channel.sendToQueue(queue, Buffer.from(msg), { persistent: true })
-  console.log('Sent: ' + msg)
+  channel.sendToQueue(params.queue, Buffer.from(params.msg), {
+    persistent: true
+  })
+  console.log('Sent: ' + params.msg)
 
-  setTimeout(() => {
-    connection.close()
-    process.exit(0)
-  }, 500)
+  await setTimeout(0)
+
+  await RabbitMQService.close()
 }
-send()
+
+publish({ queue: queue.test, msg: 'hello' })
