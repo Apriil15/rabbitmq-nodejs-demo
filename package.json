@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "provider": "ts-node provider.ts",
-    "worker": "ts-node worker.ts"
+    "publisher": "ts-node publisher.ts",
+    "consumer": "ts-node consumer.ts"
   },
   "keywords": [],
   "author": "",
